@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>แอปถ่ายรูป</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      text-align: center;
+      font-family: sans-serif;
+      padding: 1rem;
+    }
+    video, canvas {
+      width: 90%;
+      max-width: 400px;
+      margin: 1rem auto;
+      border-radius: 12px;
+    }
+    button {
+      margin: 0.5rem;
+      padding: 1rem 1.5rem;
+      font-size: 16px;
+      background: #00d26a;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>📸 แอปถ่ายรูป</h1>
+  <video id="camera" autoplay playsinline></video>
+  <br>
+  <button onclick="switchCamera()">🔄 เปลี่ยนกล้อง</button>
+  <button onclick="takePhoto()">📷 ถ่ายรูป</button>
+  <br>
+  <canvas id="photo" style="display:none;"></canvas>
+
+  <script>
+    let useFrontCamera = false;
+    let stream;
+
+    async function startCamera() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+
+      const constraints = {
+        video: { facingMode: useFrontCamera ? "user" : "environment" },
+        audio: false
+      };
+
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        document.getElementById("camera").srcObject = stream;
+      } catch (err) {
+        alert("ไม่สามารถเข้ากล้องได้: " + err.message);
+      }
+    }
+
+    function switchCamera() {
+      useFrontCamera = !useFrontCamera;
+      startCamera();
+    }
+
+    function takePhoto() {
+      const video = document.getElementById("camera");
+      const canvas = document.getElementById("photo");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0);
+      canvas.style.display = "block";
+    }
+
+    startCamera();
+  </script>
+</body>
+</html>
